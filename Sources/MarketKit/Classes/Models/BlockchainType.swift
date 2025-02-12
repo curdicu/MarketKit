@@ -1,4 +1,4 @@
-public enum BlockchainType {
+public enum BlockchainType: CaseIterable {
     case bitcoin
     case bitcoinCash
     case ecash
@@ -19,6 +19,30 @@ public enum BlockchainType {
     case ton
     case base
     case unsupported(uid: String)
+
+    public static var allCases: [BlockchainType] {
+        [
+            .bitcoin,
+            .bitcoinCash,
+            .ecash,
+            .litecoin,
+            .dash,
+            .zcash,
+            .ethereum,
+            .binanceSmartChain,
+            .binanceChain,
+            .polygon,
+            .avalanche,
+            .optimism,
+            .arbitrumOne,
+            .gnosis,
+            .fantom,
+            .tron,
+            .solana,
+            .ton,
+            .base
+        ]
+    }
 
     public init(uid: String) {
         switch uid {

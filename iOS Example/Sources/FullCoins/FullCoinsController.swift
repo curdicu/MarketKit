@@ -8,6 +8,7 @@ class FullCoinsController: UIViewController {
     private let tableView = UITableView()
 
     private var currentFilter: String = ""
+    private var selectedBlockchainType: BlockchainType?
 
     private var fullCoins = [FullCoin]()
     private var cancellables = Set<AnyCancellable>()
@@ -30,6 +31,9 @@ class FullCoinsController: UIViewController {
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.showsCancelButton = false
         searchController.searchResultsUpdater = self
+
+        let blockchainButton = UIBarButtonItem(title: "网络", style: .plain, target: self, action: #selector(showBlockchainPicker))
+        navigationItem.rightBarButtonItem = blockchainButton
 
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
@@ -56,11 +60,44 @@ class FullCoinsController: UIViewController {
 
     private func syncCoins() {
         do {
-            fullCoins = try Singleton.instance.kit.fullCoins(filter: currentFilter)
+            var coins = try Singleton.instance.kit.fullCoins(filter: currentFilter)
+            if let blockchainType = selectedBlockchainType {
+                coins = coins.filter { fullCoin in
+                    fullCoin.tokens.contains { token in
+                        token.blockchainType == blockchainType
+                    }
+                }
+            }
+            fullCoins = coins
             tableView.reloadData()
         } catch {
             print("Failed to sync coins: \(error)")
         }
+    }
+
+    @objc private func showBlockchainPicker() {
+        let alert = UIAlertController(title: "选择网络", message: nil, preferredStyle: .actionSheet)
+
+        let blockchainTypes = BlockchainType.allCases
+        
+        for blockchainType in blockchainTypes {
+            let action = UIAlertAction(title: String(describing: blockchainType), style: .default) { [weak self] _ in
+                self?.selectedBlockchainType = blockchainType
+                self?.syncCoins()
+            }
+            alert.addAction(action)
+        }
+
+        let clearAction = UIAlertAction(title: "全部网络", style: .default) { [weak self] _ in
+            self?.selectedBlockchainType = nil
+            self?.syncCoins()
+        }
+        alert.addAction(clearAction)
+
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel)
+        alert.addAction(cancelAction)
+
+        present(alert, animated: true)
     }
 }
 
