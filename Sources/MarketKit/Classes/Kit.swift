@@ -174,8 +174,8 @@ public extension Kit {
 
     // Categories
 
-    func coinCategories(currencyCode: String, withTopCoins: Bool = false) async throws -> [CoinCategory] {
-        try await hsProvider.coinCategories(currencyCode: currencyCode, withTopCoins: withTopCoins)
+    func coinCategories(currencyCode: String) async throws -> [CoinCategory] {
+        try await hsProvider.coinCategories(currencyCode: currencyCode)
     }
 
     func coinCategoryMarketCapChart(category: String, currencyCode: String?, timePeriod: HsTimePeriod) async throws -> [CategoryMarketPoint] {
